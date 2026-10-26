@@ -1,0 +1,7 @@
+# Reverse proxy con HTTPS automático (Let's Encrypt).
+# Caddy saca y renueva el certificado solo con que el dominio apunte al VPS.
+# DOMAIN y TLS_EMAIL se definen en el .env de producción.
+{$DOMAIN} {
+	tls {$TLS_EMAIL}
+	reverse_proxy app:3000
+}
