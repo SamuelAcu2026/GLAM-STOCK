@@ -1,0 +1,39 @@
+// Schema de Prisma: define el modelo de datos y cómo se mapea a PostgreSQL.
+// A partir de este archivo se generan las migraciones y el cliente tipado.
+// En Prisma 7 el cliente se genera en generated/prisma y la URL vive en prisma7.config.ts.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Categorías fijas de productos/insumos del rubro cosmética.
+enum Category {
+  COSMETICS
+  NAILS
+  MAKEUP
+  TOOLS
+}
+
+// Producto o insumo del stock. Cada campo de dinero usa Decimal para evitar
+// errores de redondeo que sí tendríamos con floats.
+model Product {
+  id               String   @id @default(cuid())
+  code             String   @unique // código de producto, no se puede repetir
+  name             String
+  quantity         Int      @default(0) // stock disponible
+  imagePath        String? // ruta del archivo de imagen (NUNCA el binario)
+  description      String?
+  costPrice        Decimal  @db.Decimal(12, 2) // precio de costo
+  markupPercentage Decimal? @db.Decimal(6, 2) // % de margen; null si se cargó precio directo
+  salePrice        Decimal  @db.Decimal(12, 2) // precio de venta ya calculado/materializado
+  category         Category
+  section          String? // sección libre para agrupar/filtrar (ej: torno, pestañas, esmaltes)
+  isActive         Boolean  @default(true) // activo/inactivo: reemplaza al borrado
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
